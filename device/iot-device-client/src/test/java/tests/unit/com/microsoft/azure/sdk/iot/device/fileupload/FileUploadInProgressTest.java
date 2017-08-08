@@ -3,7 +3,7 @@
 
 package tests.unit.com.microsoft.azure.sdk.iot.device.fileupload;
 
-import com.microsoft.azure.sdk.iot.device.IotHubEventCallback;
+import com.microsoft.azure.sdk.iot.device.IotHubFileUploadCallback;
 import com.microsoft.azure.sdk.iot.device.IotHubStatusCode;
 import com.microsoft.azure.sdk.iot.device.fileupload.FileUploadInProgress;
 import mockit.Deencapsulation;
@@ -13,6 +13,8 @@ import mockit.Verifications;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -26,7 +28,7 @@ import static org.junit.Assert.*;
 public class FileUploadInProgressTest
 {
     @Mocked
-    private IotHubEventCallback mockIotHubEventCallback;
+    private IotHubFileUploadCallback mockIotHubFileUploadCallback;
 
     @Mocked
     private Future mockFuture;
@@ -40,11 +42,11 @@ public class FileUploadInProgressTest
 
         // act
         FileUploadInProgress fileUploadInProgress = Deencapsulation.newInstance(FileUploadInProgress.class,
-                new Class[] {IotHubEventCallback.class, Object.class},
-                mockIotHubEventCallback, context);
+                new Class[] {IotHubFileUploadCallback.class, Object.class},
+                mockIotHubFileUploadCallback, context);
 
         // assert
-        assertEquals(mockIotHubEventCallback, Deencapsulation.getField(fileUploadInProgress, "statusCallback"));
+        assertEquals(mockIotHubFileUploadCallback, Deencapsulation.getField(fileUploadInProgress, "statusCallback"));
         assertEquals(context, Deencapsulation.getField(fileUploadInProgress, "statusCallbackContext"));
     }
 
@@ -57,8 +59,8 @@ public class FileUploadInProgressTest
 
         // act
         Deencapsulation.newInstance(FileUploadInProgress.class,
-                new Class[] {IotHubEventCallback.class, Object.class},
-                (IotHubEventCallback)null, context);
+                new Class[] {IotHubFileUploadCallback.class, Object.class},
+                (IotHubFileUploadCallback)null, context);
     }
 
     /* Codes_SRS_FILEUPLOADINPROGRESS_21_003: [The setTask shall sore the content of the `task`.] */
@@ -68,8 +70,8 @@ public class FileUploadInProgressTest
         // arrange
         final Map<String, Object> context = new HashMap<>();
         FileUploadInProgress fileUploadInProgress = Deencapsulation.newInstance(FileUploadInProgress.class,
-                new Class[] {IotHubEventCallback.class, Object.class},
-                mockIotHubEventCallback, context);
+                new Class[] {IotHubFileUploadCallback.class, Object.class},
+                mockIotHubFileUploadCallback, context);
 
         // act
         Deencapsulation.invoke(fileUploadInProgress, "setTask", new Class[] {Future.class}, mockFuture);
@@ -85,8 +87,8 @@ public class FileUploadInProgressTest
         // arrange
         final Map<String, Object> context = new HashMap<>();
         FileUploadInProgress fileUploadInProgress = Deencapsulation.newInstance(FileUploadInProgress.class,
-                new Class[] {IotHubEventCallback.class, Object.class},
-                mockIotHubEventCallback, context);
+                new Class[] {IotHubFileUploadCallback.class, Object.class},
+                mockIotHubFileUploadCallback, context);
 
         // act
         Deencapsulation.invoke(fileUploadInProgress, "setTask", new Class[] {Future.class}, (Future)null);
@@ -94,22 +96,23 @@ public class FileUploadInProgressTest
 
     /* Codes_SRS_FILEUPLOADINPROGRESS_21_005: [The triggerCallback shall call the execute in `statusCallback` with the provided `iotHubStatusCode` and `statusCallbackContext`.] */
     @Test
-    public void triggerCallbackSuccess()
+    public void triggerCallbackSuccess() throws URISyntaxException
     {
         // arrange
         final Map<String, Object> context = new HashMap<>();
+        final URI blobURI = new URI("test/blob.uri");
         FileUploadInProgress fileUploadInProgress = Deencapsulation.newInstance(FileUploadInProgress.class,
-                new Class[] {IotHubEventCallback.class, Object.class},
-                mockIotHubEventCallback, context);
+                new Class[] {IotHubFileUploadCallback.class, Object.class},
+                mockIotHubFileUploadCallback, context);
 
         // act
-        Deencapsulation.invoke(fileUploadInProgress, "triggerCallback", new Class[] {IotHubStatusCode.class}, IotHubStatusCode.OK);
+        Deencapsulation.invoke(fileUploadInProgress, "triggerCallback", new Class[] {IotHubStatusCode.class, URI.class}, IotHubStatusCode.OK, blobURI);
 
         // assert
         new Verifications()
         {
             {
-                Deencapsulation.invoke(mockIotHubEventCallback, "execute", new Class[] {IotHubStatusCode.class, Object.class}, IotHubStatusCode.OK, context);
+                Deencapsulation.invoke(mockIotHubFileUploadCallback, "execute", new Class[] {IotHubStatusCode.class, URI.class, Object.class}, IotHubStatusCode.OK, blobURI, context);
                 times = 1;
             }
         };
@@ -122,8 +125,8 @@ public class FileUploadInProgressTest
         // arrange
         final Map<String, Object> context = new HashMap<>();
         FileUploadInProgress fileUploadInProgress = Deencapsulation.newInstance(FileUploadInProgress.class,
-                new Class[] {IotHubEventCallback.class, Object.class},
-                mockIotHubEventCallback, context);
+                new Class[] {IotHubFileUploadCallback.class, Object.class},
+                mockIotHubFileUploadCallback, context);
         Deencapsulation.invoke(fileUploadInProgress, "setTask", new Class[] {Future.class}, mockFuture);
         new NonStrictExpectations()
         {
@@ -148,8 +151,8 @@ public class FileUploadInProgressTest
         // arrange
         final Map<String, Object> context = new HashMap<>();
         FileUploadInProgress fileUploadInProgress = Deencapsulation.newInstance(FileUploadInProgress.class,
-                new Class[] {IotHubEventCallback.class, Object.class},
-                mockIotHubEventCallback, context);
+                new Class[] {IotHubFileUploadCallback.class, Object.class},
+                mockIotHubFileUploadCallback, context);
         Deencapsulation.invoke(fileUploadInProgress, "setTask", new Class[] {Future.class}, mockFuture);
         new NonStrictExpectations()
         {
@@ -174,8 +177,8 @@ public class FileUploadInProgressTest
         // arrange
         final Map<String, Object> context = new HashMap<>();
         FileUploadInProgress fileUploadInProgress = Deencapsulation.newInstance(FileUploadInProgress.class,
-                new Class[] {IotHubEventCallback.class, Object.class},
-                mockIotHubEventCallback, context);
+                new Class[] {IotHubFileUploadCallback.class, Object.class},
+                mockIotHubFileUploadCallback, context);
 
         // act
         Deencapsulation.invoke(fileUploadInProgress, "isCancelled");

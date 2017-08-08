@@ -5,7 +5,7 @@ package tests.unit.com.microsoft.azure.sdk.iot.device.fileupload;
 
 import com.microsoft.azure.sdk.iot.device.CustomLogger;
 import com.microsoft.azure.sdk.iot.device.DeviceClientConfig;
-import com.microsoft.azure.sdk.iot.device.IotHubEventCallback;
+import com.microsoft.azure.sdk.iot.device.IotHubFileUploadCallback;
 import com.microsoft.azure.sdk.iot.device.IotHubStatusCode;
 import com.microsoft.azure.sdk.iot.device.fileupload.FileUpload;
 import com.microsoft.azure.sdk.iot.device.fileupload.FileUploadInProgress;
@@ -19,6 +19,8 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
@@ -45,7 +47,7 @@ public class FileUploadTest
     private InputStream mockInputStream;
 
     @Mocked
-    private IotHubEventCallback mockIotHubEventCallback;
+    private IotHubFileUploadCallback mockIotFileUploadCallback;
 
     @Mocked
     private FileUploadTask mockFileUploadTask;
@@ -175,13 +177,13 @@ public class FileUploadTest
                 mockInputStream.available();
                 result = streamLength;
                 Deencapsulation.newInstance(FileUploadInProgress.class,
-                        new Class[] {IotHubEventCallback.class, Object.class},
-                        mockIotHubEventCallback, context);
+                        new Class[] {IotHubFileUploadCallback.class, Object.class},
+                        mockIotFileUploadCallback, context);
                 result = mockFileUploadInProgress;
                 times = 1;
                 Deencapsulation.newInstance(FileUploadTask.class,
-                        new Class[] { String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                        blobName, mockInputStream, streamLength, mockHttpsTransportManager, (IotHubEventCallback)any, mockFileUploadInProgress);
+                        new Class[] { String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                        blobName, mockInputStream, streamLength, mockHttpsTransportManager, (IotHubFileUploadCallback) any, mockFileUploadInProgress);
                 result = mockFileUploadTask;
                 times = 1;
                 mockScheduler.submit(mockFileUploadTask);
@@ -190,7 +192,7 @@ public class FileUploadTest
         };
 
         // act
-        fileUpload.uploadToBlobAsync(blobName, mockInputStream, streamLength, mockIotHubEventCallback, context);
+        fileUpload.uploadToBlobAsync(blobName, mockInputStream, streamLength, mockIotFileUploadCallback, context);
     }
 
     /* Tests_SRS_FILEUPLOAD_21_005: [If the `blobName` is null or empty, the uploadToBlobAsync shall throw IllegalArgumentException.] */
@@ -206,7 +208,7 @@ public class FileUploadTest
         FileUpload fileUpload = new FileUpload(mockConfig);
 
         // act
-        fileUpload.uploadToBlobAsync(blobName, mockInputStream, streamLength, mockIotHubEventCallback, context);
+        fileUpload.uploadToBlobAsync(blobName, mockInputStream, streamLength, mockIotFileUploadCallback, context);
     }
 
     /* Tests_SRS_FILEUPLOAD_21_005: [If the `blobName` is null or empty, the uploadToBlobAsync shall throw IllegalArgumentException.] */
@@ -222,7 +224,7 @@ public class FileUploadTest
         FileUpload fileUpload = new FileUpload(mockConfig);
 
         // act
-        fileUpload.uploadToBlobAsync(blobName, mockInputStream, streamLength, mockIotHubEventCallback, context);
+        fileUpload.uploadToBlobAsync(blobName, mockInputStream, streamLength, mockIotFileUploadCallback, context);
     }
 
     /* Tests_SRS_FILEUPLOAD_21_006: [If the `inputStream` is null or not available, the uploadToBlobAsync shall throw IllegalArgumentException.] */
@@ -245,7 +247,7 @@ public class FileUploadTest
         FileUpload fileUpload = new FileUpload(mockConfig);
 
         // act
-        fileUpload.uploadToBlobAsync(blobName, null, streamLength, mockIotHubEventCallback, context);
+        fileUpload.uploadToBlobAsync(blobName, null, streamLength, mockIotFileUploadCallback, context);
     }
 
     /* Tests_SRS_FILEUPLOAD_21_007: [If the `streamLength` is negative, the uploadToBlobAsync shall throw IllegalArgumentException.] */
@@ -268,7 +270,7 @@ public class FileUploadTest
         FileUpload fileUpload = new FileUpload(mockConfig);
 
         // act
-        fileUpload.uploadToBlobAsync(blobName, mockInputStream, streamLength, mockIotHubEventCallback, context);
+        fileUpload.uploadToBlobAsync(blobName, mockInputStream, streamLength, mockIotFileUploadCallback, context);
     }
 
     /* Tests_SRS_FILEUPLOAD_21_008: [If the `userCallback` is null, the uploadToBlobAsync shall throw IllegalArgumentException.] */
@@ -350,7 +352,7 @@ public class FileUploadTest
         new Verifications()
         {
             {
-                Deencapsulation.invoke(mockFileUploadInProgress, "triggerCallback" , new Class[] {IotHubStatusCode.class}, IotHubStatusCode.ERROR);
+                Deencapsulation.invoke(mockFileUploadInProgress, "triggerCallback" , new Class[] {IotHubStatusCode.class, URI.class}, IotHubStatusCode.ERROR, (URI) any);
                 times = 1;
             }
         };
@@ -360,22 +362,23 @@ public class FileUploadTest
     /* Tests_SRS_FILEUPLOAD_21_019: [The FileUploadStatusCallBack shall implements the `IotHubEventCallback` as result of the FileUploadTask.] */
     /* Tests_SRS_FILEUPLOAD_21_020: [The FileUploadStatusCallBack shall call the `statusCallback` reporting the received status.] */
     @Test
-    public void callbackBypassStatus() throws IOException
+    public void callbackBypassStatus() throws IOException, URISyntaxException
     {
         // arrange
         final Map<String, Object> context = new HashMap<>();
+        URI testURI = new URI("test/uri.test");
         constructorExpectations();
         FileUpload fileUpload = new FileUpload(mockConfig);
-        IotHubEventCallback testFileUploadStatusCallBack = Deencapsulation.newInnerInstance("FileUploadStatusCallBack", fileUpload);
+        IotHubFileUploadCallback testFileUploadStatusCallBack = Deencapsulation.newInnerInstance("FileUploadStatusCallBack", fileUpload);
 
         //act
-        testFileUploadStatusCallBack.execute(IotHubStatusCode.OK_EMPTY, mockFileUploadInProgress);
+        testFileUploadStatusCallBack.execute(IotHubStatusCode.OK_EMPTY, testURI, mockFileUploadInProgress);
 
         //assert
         new Verifications()
         {
             {
-                Deencapsulation.invoke(mockFileUploadInProgress, "triggerCallback" , new Class[] {IotHubStatusCode.class}, IotHubStatusCode.OK_EMPTY);
+                Deencapsulation.invoke(mockFileUploadInProgress, "triggerCallback" , new Class[] {IotHubStatusCode.class, URI.class}, IotHubStatusCode.OK_EMPTY, (URI) any);
                 times = 1;
             }
         };
@@ -383,7 +386,7 @@ public class FileUploadTest
 
     /* Tests_SRS_FILEUPLOAD_21_021: [The FileUploadStatusCallBack shall delete the `FileUploadInProgress` that store this file upload context.] */
     @Test
-    public void callbackDeleteFileUploadInProgress(@Mocked final LinkedBlockingDeque<?> mockFileUploadInProgressQueue) throws IOException
+    public void callbackDeleteFileUploadInProgress(@Mocked final LinkedBlockingDeque<?> mockFileUploadInProgressQueue) throws IOException, URISyntaxException
     {
         // arrange
         final Map<String, Object> context = new HashMap<>();
@@ -401,10 +404,10 @@ public class FileUploadTest
             }
         };
         FileUpload fileUpload = new FileUpload(mockConfig);
-        IotHubEventCallback testFileUploadStatusCallBack = Deencapsulation.newInnerInstance("FileUploadStatusCallBack", fileUpload);
+        IotHubFileUploadCallback testFileUploadStatusCallBack = Deencapsulation.newInnerInstance("FileUploadStatusCallBack", fileUpload);
 
         //act
-        testFileUploadStatusCallBack.execute(IotHubStatusCode.OK_EMPTY, mockFileUploadInProgress);
+        testFileUploadStatusCallBack.execute(IotHubStatusCode.OK_EMPTY, new URI("test/blob.uri"), mockFileUploadInProgress);
 
         //assert
         new Verifications()
@@ -418,16 +421,16 @@ public class FileUploadTest
 
     /* Tests_SRS_FILEUPLOAD_21_022: [If the received context is not type of `FileUploadInProgress`, the FileUploadStatusCallBack shall log a error and ignore the message.] */
     @Test
-    public void callbackContextIsNotFileUploadInProgress(@Mocked final CustomLogger mockCustomLogger) throws IOException
+    public void callbackContextIsNotFileUploadInProgress(@Mocked final CustomLogger mockCustomLogger) throws IOException, URISyntaxException
     {
         // arrange
         final Map<String, Object> context = new HashMap<>();
         constructorExpectations();
         FileUpload fileUpload = new FileUpload(mockConfig);
-        IotHubEventCallback testFileUploadStatusCallBack = Deencapsulation.newInnerInstance("FileUploadStatusCallBack", fileUpload);
+        IotHubFileUploadCallback testFileUploadStatusCallBack = Deencapsulation.newInnerInstance("FileUploadStatusCallBack", fileUpload);
 
         //act
-        testFileUploadStatusCallBack.execute(IotHubStatusCode.OK_EMPTY, context);
+        testFileUploadStatusCallBack.execute(IotHubStatusCode.OK_EMPTY, new URI("test/blob.uri"), context);
 
         //assert
         new Verifications()
@@ -441,7 +444,7 @@ public class FileUploadTest
 
     /* Tests_SRS_FILEUPLOAD_21_023: [If the FileUploadStatusCallBack failed to delete the `FileUploadInProgress`, it shall log a error.] */
     @Test
-    public void callbackDeleteFileUploadInProgressThrows(@Mocked final LinkedBlockingDeque<?> mockFileUploadInProgressQueue) throws IOException
+    public void callbackDeleteFileUploadInProgressThrows(@Mocked final LinkedBlockingDeque<?> mockFileUploadInProgressQueue) throws IOException, URISyntaxException
     {
         // arrange
         final Map<String, Object> context = new HashMap<>();
@@ -456,16 +459,16 @@ public class FileUploadTest
             }
         };
         FileUpload fileUpload = new FileUpload(mockConfig);
-        IotHubEventCallback testFileUploadStatusCallBack = Deencapsulation.newInnerInstance("FileUploadStatusCallBack", fileUpload);
+        IotHubFileUploadCallback testFileUploadStatusCallBack = Deencapsulation.newInnerInstance("FileUploadStatusCallBack", fileUpload);
 
         //act
-        testFileUploadStatusCallBack.execute(IotHubStatusCode.OK_EMPTY, mockFileUploadInProgress);
+        testFileUploadStatusCallBack.execute(IotHubStatusCode.OK_EMPTY, new URI("test/blob.uri"), mockFileUploadInProgress);
 
         //assert
         new Verifications()
         {
             {
-                Deencapsulation.invoke(mockFileUploadInProgress, "triggerCallback" , new Class[] {IotHubStatusCode.class}, IotHubStatusCode.OK_EMPTY);
+                Deencapsulation.invoke(mockFileUploadInProgress, "triggerCallback" , new Class[] {IotHubStatusCode.class, URI.class}, IotHubStatusCode.OK_EMPTY, (URI) any);
                 times = 1;
             }
         };

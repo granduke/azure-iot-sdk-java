@@ -61,7 +61,7 @@ public final class FileUploadTask implements Runnable
     private String blobName;
     private InputStream inputStream;
     private long streamLength;
-    private IotHubEventCallback userCallback;
+    private IotHubFileUploadCallback userCallback;
     private Object userCallbackContext;
 
     private String correlationId;
@@ -81,7 +81,7 @@ public final class FileUploadTask implements Runnable
      * @throws IllegalArgumentException if one of the parameters is not valid.
      */
     FileUploadTask(String blobName, InputStream inputStream, long streamLength, HttpsTransportManager httpsTransportManager,
-                    IotHubEventCallback userCallback, Object userCallbackContext) throws IllegalArgumentException
+                    IotHubFileUploadCallback userCallback, Object userCallbackContext) throws IllegalArgumentException
     {
         /* Codes_SRS_FILEUPLOADTASK_21_001: [If the `blobName` is null or empty, the constructor shall throw IllegalArgumentException.] */
         if((blobName == null) || blobName.isEmpty())
@@ -176,7 +176,7 @@ public final class FileUploadTask implements Runnable
         }
 
         /* Codes_SRS_FILEUPLOADTASK_21_029: [The run shall call the `userCallback` with the final response status.] */
-        userCallback.execute(resultStatus, userCallbackContext);
+        userCallback.execute(resultStatus, blobURI, userCallbackContext);
     }
 
     private void addBlobInformation(Message responseMessage) throws IllegalArgumentException, URISyntaxException, UnsupportedEncodingException

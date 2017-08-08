@@ -5,12 +5,13 @@ package com.microsoft.azure.sdk.iot.device.fileupload;
 
 import com.microsoft.azure.sdk.iot.device.CustomLogger;
 import com.microsoft.azure.sdk.iot.device.DeviceClientConfig;
-import com.microsoft.azure.sdk.iot.device.IotHubEventCallback;
+import com.microsoft.azure.sdk.iot.device.IotHubFileUploadCallback;
 import com.microsoft.azure.sdk.iot.device.IotHubStatusCode;
 import com.microsoft.azure.sdk.iot.device.transport.https.HttpsTransportManager;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.Queue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -91,7 +92,7 @@ public final class FileUpload
      */
     public synchronized void uploadToBlobAsync(
             String blobName, InputStream inputStream, long streamLength,
-            IotHubEventCallback statusCallback, Object statusCallbackContext)
+            IotHubFileUploadCallback statusCallback, Object statusCallbackContext)
             throws IllegalArgumentException, IOException
     {
         /* Codes_SRS_FILEUPLOAD_21_005: [If the `blobName` is null or empty, the uploadToBlobAsync shall throw IllegalArgumentException.] */
@@ -131,17 +132,17 @@ public final class FileUpload
         newUpload.setTask(taskScheduler.submit(fileUploadTask));
     }
 
-    private final class FileUploadStatusCallBack implements IotHubEventCallback
+    private final class FileUploadStatusCallBack implements IotHubFileUploadCallback
     {
         @Override
-        public synchronized void execute(IotHubStatusCode status, Object context)
+        public synchronized void execute(IotHubStatusCode status, URI blobURI, Object context)
         {
             /* Codes_SRS_FILEUPLOAD_21_019: [The FileUploadStatusCallBack shall implements the `IotHubEventCallback` as result of the FileUploadTask.] */
             if(context instanceof FileUploadInProgress)
             {
                 FileUploadInProgress uploadInProgress = (FileUploadInProgress) context;
                 /* Codes_SRS_FILEUPLOAD_21_020: [The FileUploadStatusCallBack shall call the `statusCallback` reporting the received status.] */
-                uploadInProgress.triggerCallback(status);
+                uploadInProgress.triggerCallback(status, blobURI);
                 /* Codes_SRS_FILEUPLOAD_21_021: [The FileUploadStatusCallBack shall delete the `FileUploadInProgress` that store this file upload context.] */
                 try
                 {
@@ -176,7 +177,7 @@ public final class FileUpload
         {
             if(uploadInProgress.isCancelled())
             {
-                uploadInProgress.triggerCallback(IotHubStatusCode.ERROR);
+                uploadInProgress.triggerCallback(IotHubStatusCode.ERROR, null);
             }
         }
     }

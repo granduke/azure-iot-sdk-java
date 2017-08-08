@@ -1828,7 +1828,7 @@ public class DeviceClientTest
     public void startFileUploadSucceeds(@Mocked final FileUpload mockedFileUpload,
                                         @Mocked final InputStream mockInputStream,
                                         @Mocked final IotHubSSLContext mockIotHubSSLContext,
-                                        @Mocked final IotHubEventCallback mockedStatusCB,
+                                        @Mocked final IotHubFileUploadCallback mockedStatusCB,
                                         @Mocked final PropertyCallBack mockedPropertyCB) throws IOException, URISyntaxException
     {
         // arrange
@@ -1875,7 +1875,7 @@ public class DeviceClientTest
     public void closeNowClosesFileUploadSucceeds(@Mocked final FileUpload mockedFileUpload,
                                                  @Mocked final InputStream mockInputStream,
                                                  @Mocked final IotHubSSLContext mockIotHubSSLContext,
-                                                 @Mocked final IotHubEventCallback mockedStatusCB,
+                                                 @Mocked final IotHubFileUploadCallback mockedStatusCB,
                                                  @Mocked final PropertyCallBack mockedPropertyCB) throws IOException, URISyntaxException
     {
         // arrange
@@ -1942,7 +1942,7 @@ public class DeviceClientTest
 
     /* Tests_SRS_DEVICECLIENT_21_046: [If the `inputStream` is null, the uploadToBlobAsync shall throw IllegalArgumentException.] */
     @Test (expected = IllegalArgumentException.class)
-    public void startFileUploadNullInputStreamThrows(@Mocked final IotHubEventCallback mockedStatusCB,
+    public void startFileUploadNullInputStreamThrows(@Mocked final IotHubFileUploadCallback mockedStatusCB,
                                                      @Mocked final IotHubSSLContext mockIotHubSSLContext,
                                                      @Mocked final PropertyCallBack mockedPropertyCB) throws IOException, URISyntaxException
     {
@@ -1969,7 +1969,7 @@ public class DeviceClientTest
 
     /* Tests_SRS_DEVICECLIENT_21_052: [If the `streamLength` is negative, the uploadToBlobAsync shall throw IllegalArgumentException.] */
     @Test (expected = IllegalArgumentException.class)
-    public void startFileUploadNegativeLengthThrows(@Mocked final IotHubEventCallback mockedStatusCB,
+    public void startFileUploadNegativeLengthThrows(@Mocked final IotHubFileUploadCallback mockedStatusCB,
                                                      @Mocked final InputStream mockInputStream,
                                                      @Mocked final IotHubSSLContext mockIotHubSSLContext,
                                                      @Mocked final PropertyCallBack mockedPropertyCB) throws IOException, URISyntaxException
@@ -1998,7 +1998,7 @@ public class DeviceClientTest
     @Test (expected = IllegalArgumentException.class)
     public void startFileUploadNullBlobNameThrows(@Mocked final InputStream mockInputStream,
                                                   @Mocked final IotHubSSLContext mockIotHubSSLContext,
-                                                  @Mocked final IotHubEventCallback mockedStatusCB,
+                                                  @Mocked final IotHubFileUploadCallback mockedStatusCB,
                                                   @Mocked final PropertyCallBack mockedPropertyCB) throws IOException, URISyntaxException
     {
         // arrange
@@ -2025,7 +2025,7 @@ public class DeviceClientTest
     @Test (expected = IllegalArgumentException.class)
     public void startFileUploadEmptyBlobNameThrows(@Mocked final InputStream mockInputStream,
                                                    @Mocked final IotHubSSLContext mockIotHubSSLContext,
-                                                   @Mocked final IotHubEventCallback mockedStatusCB,
+                                                   @Mocked final IotHubFileUploadCallback mockedStatusCB,
                                                    @Mocked final PropertyCallBack mockedPropertyCB) throws IOException, URISyntaxException
     {
         // arrange
@@ -2045,7 +2045,7 @@ public class DeviceClientTest
     @Test (expected = IllegalArgumentException.class)
     public void startFileUploadInvalidUTF8BlobNameThrows(@Mocked final InputStream mockInputStream,
                                                          @Mocked final IotHubSSLContext mockIotHubSSLContext,
-                                                         @Mocked final IotHubEventCallback mockedStatusCB,
+                                                         @Mocked final IotHubFileUploadCallback mockedStatusCB,
                                                          @Mocked final PropertyCallBack mockedPropertyCB) throws IOException, URISyntaxException
     {
         // arrange
@@ -2073,7 +2073,7 @@ public class DeviceClientTest
     @Test (expected = IllegalArgumentException.class)
     public void startFileUploadInvalidBigBlobNameThrows(@Mocked final InputStream mockInputStream,
                                                         @Mocked final IotHubSSLContext mockIotHubSSLContext,
-                                                        @Mocked final IotHubEventCallback mockedStatusCB,
+                                                        @Mocked final IotHubFileUploadCallback mockedStatusCB,
                                                         @Mocked final PropertyCallBack mockedPropertyCB) throws IOException, URISyntaxException
     {
         // arrange
@@ -2110,7 +2110,7 @@ public class DeviceClientTest
     @Test (expected = IllegalArgumentException.class)
     public void startFileUploadInvalidPathBlobNameThrows(@Mocked final InputStream mockInputStream,
                                                          @Mocked final IotHubSSLContext mockIotHubSSLContext,
-                                                         @Mocked final IotHubEventCallback mockedStatusCB,
+                                                         @Mocked final IotHubFileUploadCallback mockedStatusCB,
                                                          @Mocked final PropertyCallBack mockedPropertyCB) throws IOException, URISyntaxException
     {
         // arrange
@@ -2148,7 +2148,7 @@ public class DeviceClientTest
     public void startFileUploadOneFileUploadInstanceSucceeds(@Mocked final FileUpload mockedFileUpload,
                                                              @Mocked final InputStream mockInputStream,
                                                              @Mocked final IotHubSSLContext mockIotHubSSLContext,
-                                                             @Mocked final IotHubEventCallback mockedStatusCB,
+                                                             @Mocked final IotHubFileUploadCallback mockedStatusCB,
                                                              @Mocked final PropertyCallBack mockedPropertyCB) throws IOException, URISyntaxException
     {
         // arrange
@@ -2236,7 +2236,7 @@ public class DeviceClientTest
     public void startFileUploadNewInstanceThrows(@Mocked final FileUpload mockedFileUpload,
                                                  @Mocked final InputStream mockInputStream,
                                                  @Mocked final IotHubSSLContext mockIotHubSSLContext,
-                                                 @Mocked final IotHubEventCallback mockedStatusCB,
+                                                 @Mocked final IotHubFileUploadCallback mockedStatusCB,
                                                  @Mocked final PropertyCallBack mockedPropertyCB) throws IOException, URISyntaxException
     {
         // arrange
@@ -2267,7 +2267,7 @@ public class DeviceClientTest
     public void startFileUploadUploadToBlobAsyncThrows(@Mocked final FileUpload mockedFileUpload,
                                                        @Mocked final IotHubSSLContext mockIotHubSSLContext,
                                                        @Mocked final InputStream mockInputStream,
-                                                       @Mocked final IotHubEventCallback mockedStatusCB,
+                                                       @Mocked final IotHubFileUploadCallback mockedStatusCB,
                                                        @Mocked final PropertyCallBack mockedPropertyCB) throws IOException, URISyntaxException
     {
         // arrange
@@ -2301,7 +2301,7 @@ public class DeviceClientTest
     public void createIotHubSSLContextIfNotExistsSucceeds(@Mocked final FileUpload mockedFileUpload,
                                         @Mocked final InputStream mockInputStream,
                                         @Mocked final IotHubSSLContext mockIotHubSSLContext,
-                                        @Mocked final IotHubEventCallback mockedStatusCB,
+                                        @Mocked final IotHubFileUploadCallback mockedStatusCB,
                                         @Mocked final PropertyCallBack mockedPropertyCB) throws IOException, URISyntaxException
     {
         // arrange

@@ -3,7 +3,7 @@ package tests.unit.com.microsoft.azure.sdk.iot.device.fileupload;
 import com.microsoft.azure.sdk.iot.deps.serializer.FileUploadRequestParser;
 import com.microsoft.azure.sdk.iot.deps.serializer.FileUploadResponseParser;
 import com.microsoft.azure.sdk.iot.deps.serializer.FileUploadStatusParser;
-import com.microsoft.azure.sdk.iot.device.IotHubEventCallback;
+import com.microsoft.azure.sdk.iot.device.IotHubFileUploadCallback;
 import com.microsoft.azure.sdk.iot.device.IotHubMethod;
 import com.microsoft.azure.sdk.iot.device.IotHubStatusCode;
 import com.microsoft.azure.sdk.iot.device.ResponseMessage;
@@ -38,7 +38,7 @@ public class FileUploadTaskTest
     private InputStream mockInputStream;
 
     @Mocked
-    private IotHubEventCallback mockIotHubEventCallback;
+    private IotHubFileUploadCallback mockIotHubFileUploadCallback;
 
     @Mocked
     private HttpsTransportManager mockHttpsTransportManager;
@@ -89,8 +89,6 @@ public class FileUploadTaskTest
     private static final String VALID_URI_STRING = "https://" + VALID_HOST_NAME + "/" + VALID_CONTAINER_NAME + "/" + VALID_BLOB_NAME_URI + VALID_SAS_TOKEN;
     private static final long VALID_STREAM_LENGTH = 100;
     private static final Map<String, Object> VALID_CALLBACK_CONTEXT = new HashMap<>();
-
-
 
 
     private void requestExpectations(final String blobName, final String requestJson) throws IOException
@@ -210,8 +208,8 @@ public class FileUploadTaskTest
 
         // act
         Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                blobName, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                blobName, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
     }
 
     /* Tests_SRS_FILEUPLOADTASK_21_001: [If the `blobName` is null or empty, the constructor shall throw IllegalArgumentException.] */
@@ -223,8 +221,8 @@ public class FileUploadTaskTest
 
         // act
         Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                blobName, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                blobName, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
     }
 
     /* Tests_SRS_FILEUPLOADTASK_21_002: [If the `inputStream` is null, the constructor shall throw IllegalArgumentException.] */
@@ -235,8 +233,8 @@ public class FileUploadTaskTest
 
         // act
         Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, null, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, null, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
     }
 
     /* Tests_SRS_FILEUPLOADTASK_21_003: [If the `streamLength` is negative, the constructor shall throw IllegalArgumentException.] */
@@ -248,8 +246,8 @@ public class FileUploadTaskTest
 
         // act
         Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, streamLength, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, streamLength, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
     }
 
     /* Tests_SRS_FILEUPLOADTASK_21_004: [If the `httpsTransportManager` is null, the constructor shall throw IllegalArgumentException.] */
@@ -260,8 +258,8 @@ public class FileUploadTaskTest
 
         // act
         Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, null, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, null, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
     }
 
     /* Tests_SRS_FILEUPLOADTASK_21_005: [If the `userCallback` is null, the constructor shall throw IllegalArgumentException.] */
@@ -272,7 +270,7 @@ public class FileUploadTaskTest
 
         // act
         Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
                 VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, null, VALID_CALLBACK_CONTEXT);
     }
 
@@ -284,14 +282,14 @@ public class FileUploadTaskTest
 
         // act
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // assert
         assertEquals(Deencapsulation.getField(fileUploadTask, "blobName"), VALID_BLOB_NAME);
         assertEquals(Deencapsulation.getField(fileUploadTask, "inputStream"), mockInputStream);
         assertEquals(Deencapsulation.getField(fileUploadTask, "streamLength"), VALID_STREAM_LENGTH);
-        assertEquals(Deencapsulation.getField(fileUploadTask, "userCallback"), mockIotHubEventCallback);
+        assertEquals(Deencapsulation.getField(fileUploadTask, "userCallback"), mockIotHubFileUploadCallback);
         assertEquals(Deencapsulation.getField(fileUploadTask, "userCallbackContext"), VALID_CALLBACK_CONTEXT);
         assertEquals(Deencapsulation.getField(fileUploadTask, "httpsTransportManager"), mockHttpsTransportManager);
     }
@@ -304,8 +302,8 @@ public class FileUploadTaskTest
         expectSuccess(VALID_BLOB_NAME, VALID_CORRELATION_ID, VALID_HOST_NAME, VALID_CONTAINER_NAME, VALID_SAS_TOKEN,
                 VALID_REQUEST_JSON, VALID_RESPONSE_JSON, VALID_NOTIFICATION_JSON);
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -328,8 +326,8 @@ public class FileUploadTaskTest
         expectSuccess(VALID_BLOB_NAME, VALID_CORRELATION_ID, VALID_HOST_NAME, VALID_CONTAINER_NAME, VALID_SAS_TOKEN,
                 VALID_REQUEST_JSON, VALID_RESPONSE_JSON, VALID_NOTIFICATION_JSON);
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -352,8 +350,8 @@ public class FileUploadTaskTest
         expectSuccess(VALID_BLOB_NAME, VALID_CORRELATION_ID, VALID_HOST_NAME, VALID_CONTAINER_NAME, VALID_SAS_TOKEN,
                 VALID_REQUEST_JSON, VALID_RESPONSE_JSON, VALID_NOTIFICATION_JSON);
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -377,8 +375,8 @@ public class FileUploadTaskTest
         expectSuccess(VALID_BLOB_NAME, VALID_CORRELATION_ID, VALID_HOST_NAME, VALID_CONTAINER_NAME, VALID_SAS_TOKEN,
                 VALID_REQUEST_JSON, VALID_RESPONSE_JSON, VALID_NOTIFICATION_JSON);
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -401,8 +399,8 @@ public class FileUploadTaskTest
         expectSuccess(VALID_BLOB_NAME, VALID_CORRELATION_ID, VALID_HOST_NAME, VALID_CONTAINER_NAME, VALID_SAS_TOKEN,
                 VALID_REQUEST_JSON, VALID_RESPONSE_JSON, VALID_NOTIFICATION_JSON);
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -426,8 +424,8 @@ public class FileUploadTaskTest
         expectSuccess(VALID_BLOB_NAME, VALID_CORRELATION_ID, VALID_HOST_NAME, VALID_CONTAINER_NAME, VALID_SAS_TOKEN,
                 VALID_REQUEST_JSON, VALID_RESPONSE_JSON, VALID_NOTIFICATION_JSON);
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -451,8 +449,8 @@ public class FileUploadTaskTest
         expectSuccess(VALID_BLOB_NAME, VALID_CORRELATION_ID, VALID_HOST_NAME, VALID_CONTAINER_NAME, VALID_SAS_TOKEN,
                 VALID_REQUEST_JSON, VALID_RESPONSE_JSON, VALID_NOTIFICATION_JSON);
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -480,8 +478,8 @@ public class FileUploadTaskTest
         expectSuccess(VALID_BLOB_NAME, VALID_CORRELATION_ID, VALID_HOST_NAME, VALID_CONTAINER_NAME, VALID_SAS_TOKEN,
                 VALID_REQUEST_JSON, VALID_RESPONSE_JSON, VALID_NOTIFICATION_JSON);
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -509,8 +507,8 @@ public class FileUploadTaskTest
         expectSuccess(VALID_BLOB_NAME, VALID_CORRELATION_ID, VALID_HOST_NAME, VALID_CONTAINER_NAME, VALID_SAS_TOKEN,
                 VALID_REQUEST_JSON, VALID_RESPONSE_JSON, VALID_NOTIFICATION_JSON);
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -533,8 +531,8 @@ public class FileUploadTaskTest
         expectSuccess(VALID_BLOB_NAME, VALID_CORRELATION_ID, VALID_HOST_NAME, VALID_CONTAINER_NAME, VALID_SAS_TOKEN,
                 VALID_REQUEST_JSON, VALID_RESPONSE_JSON, VALID_NOTIFICATION_JSON);
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -557,8 +555,8 @@ public class FileUploadTaskTest
         expectSuccess(VALID_BLOB_NAME, VALID_CORRELATION_ID, VALID_HOST_NAME, VALID_CONTAINER_NAME, VALID_SAS_TOKEN,
                 VALID_REQUEST_JSON, VALID_RESPONSE_JSON, VALID_NOTIFICATION_JSON);
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -581,8 +579,8 @@ public class FileUploadTaskTest
         expectSuccess(VALID_BLOB_NAME, VALID_CORRELATION_ID, VALID_HOST_NAME, VALID_CONTAINER_NAME, VALID_SAS_TOKEN,
                 VALID_REQUEST_JSON, VALID_RESPONSE_JSON, VALID_NOTIFICATION_JSON);
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -605,8 +603,8 @@ public class FileUploadTaskTest
         expectSuccess(VALID_BLOB_NAME, VALID_CORRELATION_ID, VALID_HOST_NAME, VALID_CONTAINER_NAME, VALID_SAS_TOKEN,
                 VALID_REQUEST_JSON, VALID_RESPONSE_JSON, VALID_NOTIFICATION_JSON);
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -629,8 +627,8 @@ public class FileUploadTaskTest
         expectSuccess(VALID_BLOB_NAME, VALID_CORRELATION_ID, VALID_HOST_NAME, VALID_CONTAINER_NAME, VALID_SAS_TOKEN,
                 VALID_REQUEST_JSON, VALID_RESPONSE_JSON, VALID_NOTIFICATION_JSON);
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -653,8 +651,8 @@ public class FileUploadTaskTest
         expectSuccess(VALID_BLOB_NAME, VALID_CORRELATION_ID, VALID_HOST_NAME, VALID_CONTAINER_NAME, VALID_SAS_TOKEN,
                 VALID_REQUEST_JSON, VALID_RESPONSE_JSON, VALID_NOTIFICATION_JSON);
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -677,8 +675,8 @@ public class FileUploadTaskTest
         expectSuccess(VALID_BLOB_NAME, VALID_CORRELATION_ID, VALID_HOST_NAME, VALID_CONTAINER_NAME, VALID_SAS_TOKEN,
                 VALID_REQUEST_JSON, VALID_RESPONSE_JSON, VALID_NOTIFICATION_JSON);
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -687,7 +685,7 @@ public class FileUploadTaskTest
         new Verifications()
         {
             {
-                mockIotHubEventCallback.execute(IotHubStatusCode.OK, VALID_CALLBACK_CONTEXT);
+                mockIotHubFileUploadCallback.execute(IotHubStatusCode.OK, (URI) any, VALID_CALLBACK_CONTEXT);
                 times = 1;
             }
         };
@@ -707,8 +705,8 @@ public class FileUploadTaskTest
         };
 
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -719,7 +717,7 @@ public class FileUploadTaskTest
             {
                 new FileUploadRequestParser(VALID_BLOB_NAME);
                 times = 1;
-                mockIotHubEventCallback.execute(IotHubStatusCode.ERROR, VALID_CALLBACK_CONTEXT);
+                mockIotHubFileUploadCallback.execute(IotHubStatusCode.ERROR, (URI) any, VALID_CALLBACK_CONTEXT);
                 times = 1;
             }
         };
@@ -743,8 +741,8 @@ public class FileUploadTaskTest
         };
 
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -755,7 +753,7 @@ public class FileUploadTaskTest
             {
                 new IotHubTransportMessage(VALID_REQUEST_JSON);
                 times = 1;
-                mockIotHubEventCallback.execute(IotHubStatusCode.ERROR, VALID_CALLBACK_CONTEXT);
+                mockIotHubFileUploadCallback.execute(IotHubStatusCode.ERROR, (URI) any, VALID_CALLBACK_CONTEXT);
                 times = 1;
             }
         };
@@ -781,8 +779,8 @@ public class FileUploadTaskTest
         };
 
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -793,7 +791,7 @@ public class FileUploadTaskTest
             {
                 mockHttpsTransportManager.send(mockMessageRequest);
                 times = 1;
-                mockIotHubEventCallback.execute(IotHubStatusCode.ERROR, VALID_CALLBACK_CONTEXT);
+                mockIotHubFileUploadCallback.execute(IotHubStatusCode.ERROR, (URI) any, VALID_CALLBACK_CONTEXT);
                 times = 1;
             }
         };
@@ -814,8 +812,8 @@ public class FileUploadTaskTest
         };
 
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -826,7 +824,7 @@ public class FileUploadTaskTest
             {
                 mockResponseMessage.getStatus();
                 times = 1;
-                mockIotHubEventCallback.execute(IotHubStatusCode.INTERNAL_SERVER_ERROR, VALID_CALLBACK_CONTEXT);
+                mockIotHubFileUploadCallback.execute(IotHubStatusCode.INTERNAL_SERVER_ERROR, (URI) any, VALID_CALLBACK_CONTEXT);
                 times = 1;
             }
         };
@@ -847,8 +845,8 @@ public class FileUploadTaskTest
         };
 
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -859,7 +857,7 @@ public class FileUploadTaskTest
             {
                 mockResponseMessage.getStatus();
                 times = 1;
-                mockIotHubEventCallback.execute(IotHubStatusCode.ERROR, VALID_CALLBACK_CONTEXT);
+                mockIotHubFileUploadCallback.execute(IotHubStatusCode.ERROR, (URI) any, VALID_CALLBACK_CONTEXT);
                 times = 1;
             }
         };
@@ -882,8 +880,8 @@ public class FileUploadTaskTest
         };
 
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -894,7 +892,7 @@ public class FileUploadTaskTest
             {
                 mockResponseMessage.getBytes();
                 times = 1;
-                mockIotHubEventCallback.execute(IotHubStatusCode.ERROR, VALID_CALLBACK_CONTEXT);
+                mockIotHubFileUploadCallback.execute(IotHubStatusCode.ERROR, (URI) any, VALID_CALLBACK_CONTEXT);
                 times = 1;
             }
         };
@@ -917,8 +915,8 @@ public class FileUploadTaskTest
         };
 
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -929,7 +927,7 @@ public class FileUploadTaskTest
             {
                 mockResponseMessage.getBytes();
                 times = 1;
-                mockIotHubEventCallback.execute(IotHubStatusCode.ERROR, VALID_CALLBACK_CONTEXT);
+                mockIotHubFileUploadCallback.execute(IotHubStatusCode.ERROR, (URI) any, VALID_CALLBACK_CONTEXT);
                 times = 1;
             }
         };
@@ -952,8 +950,8 @@ public class FileUploadTaskTest
         };
 
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -964,7 +962,7 @@ public class FileUploadTaskTest
             {
                 mockResponseMessage.getBytes();
                 times = 1;
-                mockIotHubEventCallback.execute(IotHubStatusCode.ERROR, VALID_CALLBACK_CONTEXT);
+                mockIotHubFileUploadCallback.execute(IotHubStatusCode.ERROR, (URI) any, VALID_CALLBACK_CONTEXT);
                 times = 1;
             }
         };
@@ -989,8 +987,8 @@ public class FileUploadTaskTest
         };
 
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -1001,7 +999,7 @@ public class FileUploadTaskTest
             {
                 new FileUploadResponseParser(VALID_RESPONSE_JSON);
                 times = 1;
-                mockIotHubEventCallback.execute(IotHubStatusCode.ERROR, VALID_CALLBACK_CONTEXT);
+                mockIotHubFileUploadCallback.execute(IotHubStatusCode.ERROR, (URI) any, VALID_CALLBACK_CONTEXT);
                 times = 1;
             }
         };
@@ -1024,8 +1022,8 @@ public class FileUploadTaskTest
         };
 
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -1036,7 +1034,7 @@ public class FileUploadTaskTest
             {
                 new URI((String)any);
                 times = 1;
-                mockIotHubEventCallback.execute(IotHubStatusCode.ERROR, VALID_CALLBACK_CONTEXT);
+                mockIotHubFileUploadCallback.execute(IotHubStatusCode.ERROR, (URI) any, VALID_CALLBACK_CONTEXT);
                 times = 1;
             }
         };
@@ -1061,8 +1059,8 @@ public class FileUploadTaskTest
         failedNotificationExpectations(VALID_CORRELATION_ID, VALID_NOTIFICATION_JSON);
 
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -1073,7 +1071,7 @@ public class FileUploadTaskTest
             {
                 new CloudBlockBlob((URI) any);
                 times = 1;
-                mockIotHubEventCallback.execute(IotHubStatusCode.ERROR, VALID_CALLBACK_CONTEXT);
+                mockIotHubFileUploadCallback.execute(IotHubStatusCode.ERROR, (URI) any, VALID_CALLBACK_CONTEXT);
                 times = 1;
                 new FileUploadStatusParser(VALID_CORRELATION_ID, false, -1, (String)any);
                 times =1;
@@ -1102,8 +1100,8 @@ public class FileUploadTaskTest
         failedNotificationExpectations(VALID_CORRELATION_ID, VALID_NOTIFICATION_JSON);
 
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -1114,7 +1112,7 @@ public class FileUploadTaskTest
             {
                 mockCloudBlockBlob.upload(mockInputStream, VALID_STREAM_LENGTH);
                 times = 1;
-                mockIotHubEventCallback.execute(IotHubStatusCode.ERROR, VALID_CALLBACK_CONTEXT);
+                mockIotHubFileUploadCallback.execute(IotHubStatusCode.ERROR, (URI) any, VALID_CALLBACK_CONTEXT);
                 times = 1;
                 new FileUploadStatusParser(VALID_CORRELATION_ID, false, -1, (String)any);
                 times =1;
@@ -1140,8 +1138,8 @@ public class FileUploadTaskTest
         };
 
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -1152,7 +1150,7 @@ public class FileUploadTaskTest
             {
                 new FileUploadStatusParser(VALID_CORRELATION_ID, true, 0, (String)any);
                 times =1;
-                mockIotHubEventCallback.execute(IotHubStatusCode.ERROR, VALID_CALLBACK_CONTEXT);
+                mockIotHubFileUploadCallback.execute(IotHubStatusCode.ERROR, (URI) any, VALID_CALLBACK_CONTEXT);
                 times = 1;
             }
         };
@@ -1180,8 +1178,8 @@ public class FileUploadTaskTest
         };
 
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -1192,7 +1190,7 @@ public class FileUploadTaskTest
             {
                 new IotHubTransportMessage(VALID_NOTIFICATION_JSON);
                 times = 1;
-                mockIotHubEventCallback.execute(IotHubStatusCode.ERROR, VALID_CALLBACK_CONTEXT);
+                mockIotHubFileUploadCallback.execute(IotHubStatusCode.ERROR, (URI) any, VALID_CALLBACK_CONTEXT);
                 times = 1;
             }
         };
@@ -1222,8 +1220,8 @@ public class FileUploadTaskTest
         };
 
         FileUploadTask fileUploadTask = Deencapsulation.newInstance(FileUploadTask.class,
-                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubEventCallback.class, Object.class},
-                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubEventCallback, VALID_CALLBACK_CONTEXT);
+                new Class[] {String.class, InputStream.class, long.class, HttpsTransportManager.class, IotHubFileUploadCallback.class, Object.class},
+                VALID_BLOB_NAME, mockInputStream, VALID_STREAM_LENGTH, mockHttpsTransportManager, mockIotHubFileUploadCallback, VALID_CALLBACK_CONTEXT);
 
         // act
         Deencapsulation.invoke(fileUploadTask, "run");
@@ -1234,7 +1232,7 @@ public class FileUploadTaskTest
             {
                 mockHttpsTransportManager.send(mockMessageNotification);
                 times = 1;
-                mockIotHubEventCallback.execute(IotHubStatusCode.ERROR, VALID_CALLBACK_CONTEXT);
+                mockIotHubFileUploadCallback.execute(IotHubStatusCode.ERROR, (URI) any, VALID_CALLBACK_CONTEXT);
                 times = 1;
             }
         };

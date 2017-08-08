@@ -485,7 +485,7 @@ public final class DeviceClient implements Closeable
      * @throws IOException if the client cannot create a instance of the FileUpload or the transport.
      */
     public void uploadToBlobAsync(String destinationBlobName, InputStream inputStream, long streamLength,
-                                  IotHubEventCallback callback,
+                                  IotHubFileUploadCallback callback,
                                   Object callbackContext)
             throws IllegalArgumentException, IOException
     {

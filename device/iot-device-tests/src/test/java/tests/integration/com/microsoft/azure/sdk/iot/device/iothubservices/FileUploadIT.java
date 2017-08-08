@@ -8,6 +8,7 @@ package tests.integration.com.microsoft.azure.sdk.iot.device.iothubservices;
 import com.microsoft.azure.sdk.iot.device.DeviceClient;
 import com.microsoft.azure.sdk.iot.device.IotHubClientProtocol;
 import com.microsoft.azure.sdk.iot.device.IotHubEventCallback;
+import com.microsoft.azure.sdk.iot.device.IotHubFileUploadCallback;
 import com.microsoft.azure.sdk.iot.device.IotHubStatusCode;
 import com.microsoft.azure.sdk.iot.service.*;
 import com.microsoft.azure.sdk.iot.service.exceptions.IotHubException;
@@ -17,6 +18,7 @@ import tests.integration.com.microsoft.azure.sdk.iot.device.DeviceConnectionStri
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
@@ -70,6 +72,7 @@ public class FileUploadIT
     private static class FileUploadState
     {
         String blobName;
+        URI blobURI;
         InputStream fileInputStream;
         long fileLength;
         boolean isCallBackTriggered;
@@ -83,38 +86,34 @@ public class FileUploadIT
         STATUS messageStatus;
     }
 
-    private static class FileUploadCallback implements IotHubEventCallback
+    private static class FileUploadCallback implements IotHubEventCallback, IotHubFileUploadCallback
     {
         @Override
         public void execute(IotHubStatusCode responseStatus, Object context)
         {
-            if (context instanceof FileUploadState)
+            MessageState messageState = (MessageState) context;
+            // On failure, Don't update message status any further
+            if ((responseStatus == OK || responseStatus == OK_EMPTY) && messageState.messageStatus != FAILURE)
             {
-                FileUploadState fileUploadState = (FileUploadState) context;
-                fileUploadState.isCallBackTriggered = true;
-
-                // On failure, Don't update fileUploadStatus any further
-                if ((responseStatus == OK || responseStatus == OK_EMPTY) && fileUploadState.fileUploadStatus != FAILURE)
-                {
-                    fileUploadState.fileUploadStatus = SUCCESS;
-                }
-                else
-                {
-                    fileUploadState.fileUploadStatus = FAILURE;
-                }
+                messageState.messageStatus = SUCCESS;
             }
-            else if (context instanceof MessageState)
+            else
             {
-                MessageState messageState = (MessageState) context;
-                // On failure, Don't update message status any further
-                if ((responseStatus == OK || responseStatus == OK_EMPTY) && messageState.messageStatus != FAILURE)
-                {
-                    messageState.messageStatus = SUCCESS;
-                }
-                else
-                {
-                    messageState.messageStatus = FAILURE;
-                }
+                messageState.messageStatus = FAILURE;
+            }
+        }
+
+        @Override
+        public void execute(IotHubStatusCode responseStatus, URI blobURI, Object context) {
+            FileUploadState fileUploadState = (FileUploadState) context;
+            fileUploadState.isCallBackTriggered = true;
+            fileUploadState.blobURI = blobURI;
+
+            // On failure, Don't update fileUploadStatus any further
+            if ((responseStatus == OK || responseStatus == OK_EMPTY) && fileUploadState.fileUploadStatus != FAILURE) {
+                fileUploadState.fileUploadStatus = SUCCESS;
+            } else {
+                fileUploadState.fileUploadStatus = FAILURE;
             }
         }
     }

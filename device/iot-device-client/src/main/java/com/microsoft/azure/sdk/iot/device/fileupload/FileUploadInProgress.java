@@ -3,10 +3,11 @@
 
 package com.microsoft.azure.sdk.iot.device.fileupload;
 
-import com.microsoft.azure.sdk.iot.device.IotHubEventCallback;
+import com.microsoft.azure.sdk.iot.device.IotHubFileUploadCallback;
 import com.microsoft.azure.sdk.iot.device.IotHubStatusCode;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.concurrent.Future;
 
 /**
@@ -14,7 +15,7 @@ import java.util.concurrent.Future;
  */
 public final class FileUploadInProgress
 {
-    private IotHubEventCallback statusCallback;
+    private IotHubFileUploadCallback statusCallback;
     private Object statusCallbackContext;
     private Future task;
 
@@ -25,7 +26,7 @@ public final class FileUploadInProgress
      * @param statusCallbackContext is the context of the callback, allowing multiple uploads in parallel.
      * @throws IllegalArgumentException if the stratusCallback is null.
      */
-    FileUploadInProgress(IotHubEventCallback statusCallback, Object statusCallbackContext) throws IllegalArgumentException
+    FileUploadInProgress(IotHubFileUploadCallback statusCallback, Object statusCallbackContext) throws IllegalArgumentException
     {
         /* Codes_SRS_FILEUPLOADINPROGRESS_21_002: [If the `statusCallback` is null, the constructor shall throws IllegalArgumentException.] */
         if(statusCallback == null)
@@ -61,10 +62,10 @@ public final class FileUploadInProgress
      *
      * @param iotHubStatusCode is the status to report.
      */
-    void triggerCallback(IotHubStatusCode iotHubStatusCode)
+    void triggerCallback(IotHubStatusCode iotHubStatusCode, URI blobURI)
     {
         /* Codes_SRS_FILEUPLOADINPROGRESS_21_005: [The triggerCallback shall call the execute in `statusCallback` with the provided `iotHubStatusCode` and `statusCallbackContext`.] */
-        statusCallback.execute(iotHubStatusCode, statusCallbackContext);
+        statusCallback.execute(iotHubStatusCode, blobURI, statusCallbackContext);
     }
 
     /**

@@ -5,10 +5,11 @@ package samples.com.microsoft.azure.sdk.iot;
 
 import com.microsoft.azure.sdk.iot.device.DeviceClient;
 import com.microsoft.azure.sdk.iot.device.IotHubClientProtocol;
-import com.microsoft.azure.sdk.iot.device.IotHubEventCallback;
+import com.microsoft.azure.sdk.iot.device.IotHubFileUploadCallback;
 import com.microsoft.azure.sdk.iot.device.IotHubStatusCode;
 
 import java.io.*;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,11 +24,11 @@ public class FileUploadSample
 {
     private static List<String> fileNameList = new ArrayList<>();
 
-    protected static class FileUploadStatusCallBack implements IotHubEventCallback
+    protected static class FileUploadStatusCallBack implements IotHubFileUploadCallback
     {
-        public void execute(IotHubStatusCode status, Object context)
+        public void execute(IotHubStatusCode status, URI blobURI, Object context)
         {
-            System.out.println("IoT Hub responded to file upload for " + fileNameList.get((int)context) + " operation with status " + status.name());
+            System.out.println(String.format("IoT Hub responded to file upload for %s. URI: %s; Status: %s", fileNameList.get((int) context), blobURI.toString(), status.name()));
         }
     }
 
